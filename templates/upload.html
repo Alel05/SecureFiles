@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureFiles - Upload File</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#F5F5F5] min-h-screen flex flex-col justify-between relative">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-toast-container" class="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 transition-opacity duration-500 ease-in-out">
+          {% for category, message in messages %}
+            <div class="p-4 text-sm font-medium rounded-lg shadow-lg text-center border {% if category == 'danger' %}bg-red-50 text-red-700 border-red-200{% elif category == 'warning' %}bg-yellow-50 text-yellow-700 border-yellow-200{% else %}bg-green-50 text-green-700 border-green-200{% endif %}">
+              {% if category == 'danger' or category == 'warning' %} {% else %} {% endif %} {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <nav class="bg-[#1E293B] text-white px-12 py-5 flex justify-between items-center shadow-sm">
+        <div class="text-2xl font-bold tracking-tight">SecureFiles</div>
+        <div class="flex space-x-8 text-sm font-medium text-gray-300">
+            <a href="{{ url_for('dashboard') }}" class="hover:text-white transition-colors">Dashboard</a>
+            <a href="{{ url_for('logout') }}" onclick="return confirm('Are you sure you want to log out?');" class="hover:text-white transition-colors">Logout</a>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl w-full mx-auto px-8 pt-12 pb-24 flex-grow flex items-start justify-center">
+        <div class="bg-white rounded-lg border border-gray-200 p-14 shadow-[0_2px_12px_rgba(0,0,0,0.01)] w-full">
+            
+            <h2 class="text-2xl font-bold text-[#1E293B] mb-1">Upload File</h2>
+            <p class="text-xs text-gray-500 mb-8">Encrypt file before storing.</p>
+
+            <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                
+                <div class="w-full flex items-center border border-gray-400 rounded bg-white text-sm">
+                    <label class="bg-[#EFEFEF] hover:bg-gray-200 text-gray-800 border-r border-gray-400 text-xs px-5 py-2.5 cursor-pointer font-medium select-none transition-colors">
+                        Choose File
+                        <input type="file" name="file" id="fileInput" required class="hidden" onchange="updateFileName()">
+                    </label>
+                    <span id="fileChosenLabel" class="text-gray-400 px-4 text-xs font-normal truncate">No file chosen</span>
+                </div>
+
+                <div>
+                    <input type="password" name="file_password" required placeholder="File password"
+                        class="w-full px-4 py-2.5 bg-white border border-gray-400 rounded text-sm placeholder-gray-400 focus:outline-none transition-colors">
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-[#0B5FFF] hover:bg-blue-700 text-white text-xs font-medium py-3 px-4 rounded transition-colors duration-150 cursor-pointer text-center">
+                    Upload File
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-5 border-t border-gray-200 text-xs text-gray-400 bg-white tracking-wide">
+        © 2026 SecureFiles— AES-256 encrypted uploads
+    </footer>
+
+    <script>
+        function updateFileName() {
+            const input = document.getElementById('fileInput');
+            const label = document.getElementById('fileChosenLabel');
+            if(input.files && input.files.length > 0) {
+                label.textContent = input.files[0].name;
+                label.classList.remove('text-gray-400');
+                label.classList.add('text-gray-800');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const toast = document.getElementById("flash-toast-container");
+            if (toast) {
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 500);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
